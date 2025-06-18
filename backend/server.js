@@ -13,3 +13,30 @@ import requestRoutes from './routes/requests.js';
 import chatRoutes from './routes/chat.js';
 import adminRoutes from './routes/admin.js';
 import { setupSocket } from './sockets/socketHandler.js';
+
+dotenv.config();
+
+const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
+});
+
+connectDB();
+
+app.use(helmet());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // كل 15 دقيقة
+  max: 100
+});
+app.use(limiter);
+
+
